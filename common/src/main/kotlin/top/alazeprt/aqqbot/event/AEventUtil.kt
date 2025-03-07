@@ -32,7 +32,8 @@ object AEventUtil {
             plugin.submitAsync {
                 plugin.enableGroups.forEach {
                     BotProvider.getBot()?.action(
-                        SendGroupMessage(it.toLong(), plugin.generalConfig.getString("notify.player_status.${if (isJoin) "join" else "leave"}")!!
+                        SendGroupMessage(it.toLong(), plugin.generalConfig
+                            .getStringList("notify.player_status.${if (isJoin) "join" else "leave"}").random()!!
                             .replace("\${playerName}", playerName)
                             .replace("\${userId}", qq.toString()), true)
                     )

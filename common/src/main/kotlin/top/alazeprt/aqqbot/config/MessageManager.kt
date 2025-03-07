@@ -6,11 +6,11 @@ class MessageManager(plugin: AQQBot) {
     private val messageConfig = plugin.messageConfig
 
     fun get(key: String): String {
-        return messageConfig.getString(key)?: ""
+        return messageConfig.getStringList(key).random()?: ""
     }
 
     fun get(key: String, map: Map<String, String>): String {
-        var content = messageConfig.getString(key)?: ""
+        var content = messageConfig.getStringList(key).random()?: ""
         for ((k, v) in map) {
             content = content.replace("\${$k}", v)
         }
@@ -34,7 +34,7 @@ class MessageManager(plugin: AQQBot) {
     }
 
     fun getOriginList(key: String, map: Map<String, String>): MutableList<String> {
-        var content = messageConfig.getStringList(key)
+        val content = messageConfig.getStringList(key)
         for ((k, v) in map) {
             content.forEach {
                 it.replace("\${$k}", v)

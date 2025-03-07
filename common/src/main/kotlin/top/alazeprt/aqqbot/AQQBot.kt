@@ -73,7 +73,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 BotProvider.getBot()!!.isConnected()) {
             enableGroups.forEach {
                 BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
-                    generalConfig.getString("notify.server_status.start")?: "[AQQBot] 服务器已启动!"))
+                    generalConfig.getStringList("notify.server_status.start").random()?: "[AQQBot] 服务器已启动!"))
             }
         }
     }
@@ -85,7 +85,7 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
             BotProvider.getBot()!!.isConnected) {
             enableGroups.forEach {
                 BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
-                    generalConfig.getString("notify.server_status.stop")?: "[AQQBot] 服务器已关闭!"))
+                    generalConfig.getStringList("notify.server_status.stop").random()?: "[AQQBot] 服务器已关闭!"))
             }
         }
         unloadBot()
