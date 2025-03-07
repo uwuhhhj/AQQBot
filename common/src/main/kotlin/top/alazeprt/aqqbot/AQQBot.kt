@@ -1,11 +1,10 @@
 package top.alazeprt.aqqbot
 
-import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.adapter.AQQBotAdapter
-import top.alazeprt.aqqbot.bot.BotProvider
+import top.alazeprt.aqqbot.bot.BotProvider.getBot
 import top.alazeprt.aqqbot.bot.BotProvider.loadBot
 import top.alazeprt.aqqbot.bot.BotProvider.unloadBot
 import top.alazeprt.aqqbot.command.CommandProvider
@@ -13,7 +12,6 @@ import top.alazeprt.aqqbot.config.ConfigProvider
 import top.alazeprt.aqqbot.config.MessageManager
 import top.alazeprt.aqqbot.data.*
 import top.alazeprt.aqqbot.debug.ADebug
-import top.alazeprt.aqqbot.event.AEvent
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
@@ -55,6 +53,25 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 botConfig.getString("access_token")
             )
         }
+        submitAsync {
+            while (true) {
+                if (getBot()?.isConnected != true) {
+                    if (botConfig.getString("access_token").isNullOrBlank()) {
+                        loadBot(
+                            this,
+                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+                        )
+                    } else {
+                        loadBot(
+                            this,
+                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                            botConfig.getString("access_token")
+                        )
+                    }
+                }
+                Thread.sleep(botConfig.getLong("check_interval") * 1000)
+            }
+        }
         loadHook(this)
         if (generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
             submitAsync {
@@ -69,11 +86,13 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 }
             }
         }
-        if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
-                BotProvider.getBot()!!.isConnected()) {
+        if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
+                getBot()!!.isConnected()) {
             enableGroups.forEach {
-                BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
-                    generalConfig.getStringList("notify.server_status.start").random()?: "[AQQBot] 服务器已启动!"))
+                getBot()!!.action(SendGroupMessage(it.toLong(),
+                    if (generalConfig.getStringList("notify.server_status.start").isEmpty())
+                        generalConfig.getString("notify.server_status.start")?: "[AQQBot] 服务器已启动!"
+                    else generalConfig.getStringList("notify.server_status.start").random()?: "[AQQBot] 服务器已启动!"))
             }
         }
     }
@@ -81,11 +100,13 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     fun loadDependencies()
 
     fun disable() {
-        if (generalConfig.getBoolean("notify.server_status.enable") && BotProvider.getBot() != null &&
-            BotProvider.getBot()!!.isConnected) {
+        if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
+            getBot()!!.isConnected) {
             enableGroups.forEach {
-                BotProvider.getBot()!!.action(SendGroupMessage(it.toLong(),
-                    generalConfig.getStringList("notify.server_status.stop").random()?: "[AQQBot] 服务器已关闭!"))
+                getBot()!!.action(SendGroupMessage(it.toLong(),
+                    if (generalConfig.getStringList("notify.server_status.stop").isEmpty())
+                        generalConfig.getString("notify.server_status.stop")?: "[AQQBot] 服务器已关闭!"
+                    else generalConfig.getStringList("notify.server_status.stop").random()?: "[AQQBot] 服务器已关闭!"))
             }
         }
         unloadBot()

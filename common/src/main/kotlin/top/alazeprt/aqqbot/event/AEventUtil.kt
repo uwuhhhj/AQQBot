@@ -31,9 +31,11 @@ object AEventUtil {
             val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
             plugin.submitAsync {
                 plugin.enableGroups.forEach {
+                    val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
                     BotProvider.getBot()?.action(
-                        SendGroupMessage(it.toLong(), plugin.generalConfig
-                            .getStringList("notify.player_status.${if (isJoin) "join" else "leave"}").random()!!
+                        SendGroupMessage(it.toLong(), if (plugin.generalConfig.getStringList(messagePath).isEmpty())
+                            plugin.generalConfig.getString(messagePath)?: "" else plugin.generalConfig
+                                .getStringList(messagePath).random()
                             .replace("\${playerName}", playerName)
                             .replace("\${userId}", qq.toString()), true)
                     )

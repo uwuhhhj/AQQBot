@@ -6,11 +6,13 @@ class MessageManager(plugin: AQQBot) {
     private val messageConfig = plugin.messageConfig
 
     fun get(key: String): String {
-        return messageConfig.getStringList(key).random()?: ""
+        return if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key)?: "" else
+            messageConfig.getStringList(key).random()?: ""
     }
 
     fun get(key: String, map: Map<String, String>): String {
-        var content = messageConfig.getStringList(key).random()?: ""
+        var content = if (messageConfig.getStringList(key).isEmpty()) messageConfig.getString(key)?: "" else
+            messageConfig.getStringList(key).random()?: ""
         for ((k, v) in map) {
             content = content.replace("\${$k}", v)
         }
