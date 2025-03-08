@@ -33,9 +33,9 @@ object AEventUtil {
                 plugin.enableGroups.forEach {
                     val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
                     BotProvider.getBot()?.action(
-                        SendGroupMessage(it.toLong(), if (plugin.generalConfig.getStringList(messagePath).isEmpty())
+                        SendGroupMessage(it.toLong(), (if (plugin.generalConfig.getStringList(messagePath).isEmpty())
                             plugin.generalConfig.getString(messagePath)?: "" else plugin.generalConfig
-                                .getStringList(messagePath).random()
+                                .getStringList(messagePath).random())
                             .replace("\${playerName}", playerName)
                             .replace("\${userId}", qq.toString()), true)
                     )

@@ -12,6 +12,7 @@ repositories {
     maven("https://repo.extendedclip.com/releases/")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://repo.opencollab.dev/main/")
     mavenCentral()
 }
 
@@ -23,6 +24,7 @@ dependencies {
     compileOnly("com.github.alazeprt:AConfiguration:1.2")
     compileOnly("com.github.alazeprt:taboolib-database:1.0.4")
     compileOnly("me.lucko:spark-api:0.1-SNAPSHOT")
+    compileOnly("org.geysermc.geyser:api:2.4.2-SNAPSHOT")
 }
 
 tasks.withType<JavaCompile> {

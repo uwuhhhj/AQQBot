@@ -14,6 +14,7 @@ repositories {
     maven("https://oss.sonatype.org/content/repositories/snapshots")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     maven("https://repo.extendedclip.com/releases/")
+    maven("https://repo.opencollab.dev/main/")
     mavenCentral()
 }
 
