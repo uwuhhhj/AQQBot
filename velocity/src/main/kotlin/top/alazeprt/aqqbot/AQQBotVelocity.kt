@@ -16,6 +16,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import me.lucko.spark.api.Spark
 import org.bstats.velocity.Metrics
+import org.geysermc.floodgate.api.FloodgateApi
 import org.slf4j.Logger
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
@@ -62,8 +63,10 @@ class AQQBotVelocity : AQQBot {
     private val pluginId = 24071
 
     override var spark: Spark? = null
+    override var floodgateApi: FloodgateApi? = null
 
-    override var loadCount: Int = 0
+    override var loadSparkCount: Int = 0
+    override var loadFloodgateCount: Int = 0
 
     lateinit var server: ProxyServer
     lateinit var logger: Logger

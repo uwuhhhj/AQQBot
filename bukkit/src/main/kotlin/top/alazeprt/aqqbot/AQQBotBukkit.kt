@@ -8,6 +8,7 @@ import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
+import org.geysermc.floodgate.api.FloodgateApi
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
 import top.alazeprt.aqqbot.adapter.*
@@ -45,8 +46,10 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     private val pluginId = 24071
 
     override var spark: Spark? = null
+    override var floodgateApi: FloodgateApi? = null
 
-    override var loadCount: Int = 0
+    override var loadSparkCount: Int = 0
+    override var loadFloodgateCount: Int = 0
 
     companion object {
         lateinit var audience: BukkitAudiences
