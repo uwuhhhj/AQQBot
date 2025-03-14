@@ -45,8 +45,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     private val pluginId = 24071
 
-    override var spark: Spark? = null
-    override var floodgateApi: FloodgateApi? = null
+    override var spark: Boolean = false
+    override var floodgateApi: Boolean = false
 
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0

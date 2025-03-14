@@ -14,9 +14,7 @@ import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
-import me.lucko.spark.api.Spark
 import org.bstats.velocity.Metrics
-import org.geysermc.floodgate.api.FloodgateApi
 import org.slf4j.Logger
 import top.alazeprt.aconfiguration.file.FileConfiguration
 import top.alazeprt.aconfiguration.file.YamlConfiguration
@@ -62,9 +60,6 @@ class AQQBotVelocity : AQQBot {
 
     private val pluginId = 24071
 
-    override var spark: Spark? = null
-    override var floodgateApi: FloodgateApi? = null
-
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0
 
@@ -72,6 +67,9 @@ class AQQBotVelocity : AQQBot {
     lateinit var logger: Logger
     lateinit var dataFolder: Path
     lateinit var metricsFactory: Metrics.Factory
+
+    override var spark: Boolean = false
+    override var floodgateApi: Boolean = false
 
     @Inject
     fun AQQBotVelocity(server: ProxyServer?, logger: Logger?, @DataDirectory dataDirectory: Path,
@@ -266,7 +264,6 @@ class AQQBotVelocity : AQQBot {
             .relocate("com{}google{}code{}gson", "top{}alazeprt{}aonebot{}lib{}com{}google")
             .resolveTransitiveDependencies(true)
             .build()
-
         libraryManager.addRepository("https://maven.aliyun.com/repository/public")
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()

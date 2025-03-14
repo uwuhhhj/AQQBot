@@ -26,6 +26,7 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
         val dataSourceConfig = YamlConfiguration.loadConfiguration(dataSourceFile)
         Database.settingsFile = DatabaseSource(dataSourceConfig)
         val dataSource by lazy { host.createDataSource() }
+
         table = Table("account_data", host) {
             add("userId") {
                 type(ColumnTypeSQL.BIGINT) {

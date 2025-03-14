@@ -1,5 +1,6 @@
 package top.alazeprt.aqqbot.handler
 
+import me.lucko.spark.api.SparkProvider
 import me.lucko.spark.api.statistic.StatisticWindow
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aonebot.event.message.GroupMessageEvent
@@ -9,12 +10,12 @@ import top.alazeprt.aqqbot.bot.BotProvider
 class InformationHandler(val plugin: AQQBot) {
     @Deprecated(message = "This feature was replaced by custom commands")
     private fun getTPS(groupId: Long) {
-        if (plugin.spark == null) {
+        if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
                 plugin.getMessageManager().get("qq.information.tps.not_installed_dependency"), true))
             return
         } else {
-            val tps = plugin.spark?.tps()
+            val tps = SparkProvider.get().tps()
             val tps5Secs = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.SECONDS_5)?: -1.0)
             val tps10Secs = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.SECONDS_10)?: -1.0)
             val tps1Min = roundTPS(tps?.poll(StatisticWindow.TicksPerSecond.MINUTES_1)?: -1.0)
@@ -32,12 +33,12 @@ class InformationHandler(val plugin: AQQBot) {
 
     @Deprecated(message = "This feature was replaced by custom commands")
     private fun getMSPT(groupId: Long) {
-        if (plugin.spark == null) {
+        if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
                 plugin.getMessageManager().get("qq.information.mspt.not_installed_dependency"), true))
             return
         } else {
-            val mspt = plugin.spark?.mspt()
+            val mspt = SparkProvider.get().mspt()
             val mspt10Secs = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.SECONDS_10)?.median()?: -1.0)
             val mspt1Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_1)?.median()?: -1.0)
             val mspt5Min = roundMSPT(mspt?.poll(StatisticWindow.MillisPerTick.MINUTES_5)?.median()?: -1.0)
@@ -76,12 +77,12 @@ class InformationHandler(val plugin: AQQBot) {
 
     @Deprecated(message = "This feature was replaced by custom commands")
     private fun getCPUInfo(groupId: Long) {
-        if (plugin.spark == null) {
+        if (!plugin.spark) {
             BotProvider.getBot()?.action(SendGroupMessage(groupId,
                 plugin.getMessageManager().get("qq.information.cpu.not_installed_dependency"), true))
             return
         } else {
-            val cpu = plugin.spark?.cpuSystem()
+            val cpu = SparkProvider.get().cpuSystem()
             val cpu10Secs = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.SECONDS_10)?: -1.0)
             val cpu1Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_1)?: -1.0)
             val cpu15Min = roundCPU(cpu?.poll(StatisticWindow.CpuUsage.MINUTES_15)?: -1.0)

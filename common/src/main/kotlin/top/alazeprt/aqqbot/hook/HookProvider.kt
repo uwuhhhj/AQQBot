@@ -1,16 +1,13 @@
 package top.alazeprt.aqqbot.hook
 
-import me.lucko.spark.api.Spark
-import me.lucko.spark.api.SparkProvider
-import org.geysermc.floodgate.api.FloodgateApi
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.util.LogLevel
 
 interface HookProvider {
 
-    var spark: Spark?
+    var spark: Boolean
 
-    var floodgateApi: FloodgateApi?
+    var floodgateApi: Boolean
 
     var loadSparkCount: Int
     var loadFloodgateCount: Int
@@ -18,7 +15,7 @@ interface HookProvider {
     fun loadSpark(plugin: AQQBot) {
         try {
             Class.forName("me.lucko.spark.api.SparkProvider")
-            spark = SparkProvider.get()
+            spark = true
             if (loadSparkCount > 0) {
                 plugin.log(LogLevel.INFO, "Spark has been loaded successfully!")
             }
@@ -41,7 +38,7 @@ interface HookProvider {
     fun loadFloodgate(plugin: AQQBot) {
         try {
             Class.forName("org.geysermc.floodgate.api.FloodgateApi")
-            floodgateApi = FloodgateApi.getInstance()
+            floodgateApi = true
             if (loadFloodgateCount > 0) {
                 plugin.log(LogLevel.INFO, "Floodgate has been loaded successfully!")
             }
@@ -54,6 +51,8 @@ interface HookProvider {
                 loadFloodgateCount++
                 loadFloodgate(plugin)
             }
+        } catch (e: ClassNotFoundException) {
+            plugin.log(LogLevel.WARN, "You don't install soft dependency: floodgate! You can't get server status via this plugin!")
         }
     }
 
