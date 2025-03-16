@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
@@ -20,6 +21,8 @@ import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
 
 class AQQBotBukkit : JavaPlugin(), AQQBot {
@@ -94,31 +97,32 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun submit(task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTask(this, task)
+        Bukkit.getGlobalRegionScheduler().run(this) { task.run() }
         return CompletableFuture.completedFuture<Void>(null)
     }
 
     override fun submitAsync(task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskAsynchronously(this, task)
+        Bukkit.getAsyncScheduler().runNow(this) { task.run() }
         return CompletableFuture.completedFuture<Void>(null)
     }
 
     override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskLater(this, task, delay)
+        Bukkit.getGlobalRegionScheduler().runDelayed(this, { task.run() }, delay)
         return CompletableFuture.completedFuture<Void>(null)
     }
 
     override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, task, delay)
+        Bukkit.getAsyncScheduler().runDelayed(this, { task.run() }, delay * 50, TimeUnit.MILLISECONDS)
         return CompletableFuture.completedFuture<Void>(null)
     }
 
     override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskTimer(this, task, delay, period)
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, { task.run() }, delay, period)
         return CompletableFuture.completedFuture<Void>(null)
     }
 
     override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
+        Bukkit.getAsyncScheduler().runAtFixedRate(this, { task.run() }, delay * 50, period * 50, TimeUnit.MILLISECONDS)
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, task, delay, period)
         return CompletableFuture.completedFuture<Void>(null)
     }

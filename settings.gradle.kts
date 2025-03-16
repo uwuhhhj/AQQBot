@@ -5,3 +5,4 @@ rootProject.name = "AQQBot"
 include("common")
 include("bukkit")
 include("velocity")
+include("folia")

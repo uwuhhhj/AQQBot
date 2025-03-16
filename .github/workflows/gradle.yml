@@ -36,6 +36,12 @@ jobs:
           name: AQQBot for Spigot
           path: |
             bukkit/build/libs/
+      - name: capture build artifacts (folia)
+        uses: actions/upload-artifact@v4.6.0
+        with:
+          name: AQQBot for Folia
+          path: |
+            folia/build/libs/
       - name: capture build artifacts (velocity)
         uses: actions/upload-artifact@v4.6.0
         with:
