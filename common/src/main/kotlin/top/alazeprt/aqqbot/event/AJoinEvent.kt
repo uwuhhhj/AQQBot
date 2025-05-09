@@ -5,19 +5,18 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler
 import top.alazeprt.aqqbot.profile.APlayer
-import top.alazeprt.aqqbot.util.LogLevel
 
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
     override fun handle() {
         var handle2 = false
         val handle1 = whitelistHandler(plugin, player.getName()) { it ->
             if (plugin.floodgateApi && FloodgateApi.getInstance()?.isFloodgatePlayer(player.getUUID()) == true) {
-                if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.correctUsername.isNullOrBlank()) {
+                if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.javaUsername.isNullOrBlank()) {
                     player.kick(it)
                     return@whitelistHandler
                 }
                 handle2 = whitelistHandler(plugin,
-                    FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.correctUsername!!) {
+                    FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.javaUsername!!) {
                     player.kick(it)
                 }
             } else {
