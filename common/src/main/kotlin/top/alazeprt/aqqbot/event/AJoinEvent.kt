@@ -11,19 +11,20 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
         var handle2 = false
         val handle1 = whitelistHandler(plugin, player.getName()) { it ->
             if (plugin.floodgateApi && FloodgateApi.getInstance()?.isFloodgatePlayer(player.getUUID()) == true) {
-                if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.javaUsername.isNullOrBlank()) {
+                if (FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username.isNullOrBlank()) {
                     player.kick(it)
                     return@whitelistHandler
                 }
                 handle2 = whitelistHandler(plugin,
-                    FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.javaUsername!!) {
+                    FloodgateApi.getInstance()?.getPlayer(player.getUUID())?.username!!) {
                     player.kick(it)
                 }
             } else {
                 player.kick(it)
             }
         }
-        if (!handle1 && !handle2) {
+
+        if (!handle1 || !handle2) {
             playerStatusHandler(plugin, player.getName(), true)
             if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
                 plugin.submitLater(10) {
