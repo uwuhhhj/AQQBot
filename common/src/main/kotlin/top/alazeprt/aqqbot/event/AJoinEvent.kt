@@ -23,7 +23,7 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
                 player.kick(it)
             }
         }
-        if (!handle1 || !handle2) {
+        if (!handle1 && !handle2) {
             playerStatusHandler(plugin, player.getName(), true)
             if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
                 plugin.submitLater(10) {
