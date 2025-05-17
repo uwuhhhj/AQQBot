@@ -25,6 +25,7 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.AChatEvent
 import top.alazeprt.aqqbot.event.AJoinEvent
 import top.alazeprt.aqqbot.event.AQuitEvent
+import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.LogLevel
@@ -90,6 +91,10 @@ class AQQBotVelocity : AQQBot {
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
         this.disable()
+    }
+
+    override fun setPlaceholders(player: APlayer, message: String): String {
+        return message
     }
 
     override fun loadAdapter(): AQQBotAdapter {

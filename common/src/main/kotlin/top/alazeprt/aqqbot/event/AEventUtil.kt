@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot.event
 import top.alazeprt.aonebot.action.SendGroupMessage
 import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.bot.BotProvider
+import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.AFormatter
 import java.util.*
 import java.util.function.Consumer
@@ -26,16 +27,18 @@ object AEventUtil {
         return false
     }
 
-    fun playerStatusHandler(plugin: AQQBot, playerName: String, isJoin: Boolean) {
+    fun playerStatusHandler(plugin: AQQBot, player: APlayer, isJoin: Boolean) {
+        val playerName = player.getName()
         if (plugin.generalConfig.getBoolean("notify.player_status.enable")) {
             val qq: Long = plugin.getQQByPlayer(plugin.adapter!!.getOfflinePlayer(playerName))?: -1L
             plugin.submitAsync {
                 plugin.enableGroups.forEach {
                     val messagePath = "notify.player_status.${if (isJoin) "join" else "leave"}"
+                    val message = if (plugin.generalConfig.getStringList(messagePath).isEmpty())
+                        plugin.generalConfig.getString(messagePath)?: ""
+                    else plugin.generalConfig.getStringList(messagePath).random()
                     BotProvider.getBot()?.action(
-                        SendGroupMessage(it.toLong(), (if (plugin.generalConfig.getStringList(messagePath).isEmpty())
-                            plugin.generalConfig.getString(messagePath)?: "" else plugin.generalConfig
-                                .getStringList(messagePath).random())
+                        SendGroupMessage(it.toLong(), plugin.setPlaceholders(player, message)
                             .replace("\${playerName}", playerName)
                             .replace("\${userId}", qq.toString()), true)
                     )

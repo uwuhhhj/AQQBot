@@ -3,6 +3,7 @@ package top.alazeprt.aqqbot
 import com.alessiodp.libby.BukkitLibraryManager
 import com.alessiodp.libby.Library
 import com.alessiodp.libby.LibraryManager
+import me.clip.placeholderapi.PlaceholderAPI
 import net.kyori.adventure.platform.bukkit.BukkitAudiences
 import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
@@ -14,6 +15,7 @@ import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.BukkitEventHandler
+import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.LogLevel
@@ -69,6 +71,16 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override fun onDisable() {
         this.disable()
         audience.close()
+    }
+
+    override fun setPlaceholders(player: APlayer, message: String): String {
+        try {
+            Class.forName("me.clip.placeholderapi.PlaceholderAPI")
+            val bukkitPlayer = player as BukkitPlayer
+            return PlaceholderAPI.setPlaceholders(bukkitPlayer.player, message)
+        } catch (e: ClassNotFoundException) {
+            return message
+        }
     }
 
     override fun loadAdapter(): AQQBotAdapter {

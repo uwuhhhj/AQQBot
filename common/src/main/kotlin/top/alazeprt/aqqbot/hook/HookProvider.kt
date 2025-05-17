@@ -1,6 +1,7 @@
 package top.alazeprt.aqqbot.hook
 
 import top.alazeprt.aqqbot.AQQBot
+import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.LogLevel
 
 interface HookProvider {
@@ -55,6 +56,8 @@ interface HookProvider {
             plugin.log(LogLevel.WARN, "You don't install soft dependency: floodgate! You can't get server status via this plugin!")
         }
     }
+
+    fun setPlaceholders(player: APlayer, message: String): String
 
     fun loadHook(plugin: AQQBot) {
         loadSpark(plugin)
