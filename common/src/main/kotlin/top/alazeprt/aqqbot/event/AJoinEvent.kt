@@ -25,7 +25,7 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
         }
 
         if (!handle1 || !handle2) {
-            playerStatusHandler(plugin, player.getName(), true)
+            playerStatusHandler(plugin, player, true)
             if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
                 plugin.submitLater(10) {
                     player.sendMessage("§a检测到你正在使用 AQQBot 的低版本配置文件, 这可能会引起一些问题")
