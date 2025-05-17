@@ -26,6 +26,9 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     val verifyCodeMap: MutableMap<String, Pair<String, Long>>  // <name, <code, time>>
 
+    val bindCooldownMap: MutableMap<String, Long>  // <name, time>
+    val unbindCooldownMap: MutableMap<String, Long>
+
     var dataProvider: DataProvider
 
     var libraryManager: LibraryManager
@@ -84,6 +87,25 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                     }
                     Thread.sleep(5000)
                 }
+            }
+        }
+        submitAsync {
+            while (true) {
+                for ((k, v) in bindCooldownMap) {
+                    if (v <= 0) {
+                        bindCooldownMap.remove(k)
+                    } else {
+                        bindCooldownMap[k] = v - 1;
+                    }
+                }
+                for ((k, v) in unbindCooldownMap) {
+                    if (v <= 0) {
+                        unbindCooldownMap.remove(k)
+                    } else {
+                        unbindCooldownMap[k] = v - 1;
+                    }
+                }
+                Thread.sleep(1000)
             }
         }
         if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&

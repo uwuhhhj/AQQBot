@@ -42,6 +42,12 @@ interface ConfigProvider {
         if (generalConfig.getInt("chat.max_forward_length") <= 0) {
             generalConfig.set("chat.max_forward_length", 200)
         }
+        if (generalConfig.getInt("version") != 17) {
+            generalConfig.set("version", 17)
+            generalConfig.set("whitelist.cooldown.bind", 60)
+            generalConfig.set("whitelist.cooldown.unbind", 86400)
+        }
+        generalConfig.save(file)
     }
 
     fun loadMessageConfig() {

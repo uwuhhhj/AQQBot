@@ -49,6 +49,9 @@ class AQQBotVelocity : AQQBot {
 
     override lateinit var enableGroups: MutableList<String>
 
+    override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+    override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+
     override lateinit var libraryManager: LibraryManager
 
     override lateinit var customCommands: MutableList<ACustom>

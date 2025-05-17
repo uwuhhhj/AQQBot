@@ -93,14 +93,28 @@ class WhitelistHandler(val plugin: AQQBot) {
         config.getStringList("whitelist.prefix.bind").forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.split(" ")[1]
-                bind(event.senderId.toString(), event.groupId, playerName)
+                if (plugin.bindCooldownMap.containsKey(playerName)) {
+                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                        plugin.getMessageManager().get("qq.whitelist.in_cooldown",
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.bindCooldownMap[playerName]!!.toString()))))
+                } else {
+                    plugin.bindCooldownMap[playerName] = config.getLong("whitelist.cooldown.bind")
+                    bind(event.senderId.toString(), event.groupId, playerName)
+                }
                 return true
             }
         }
         config.getStringList("whitelist.prefix.unbind").forEach {
             if (message.lowercase().startsWith(it.lowercase())) {
                 val playerName = message.substring(it.length + 1)
-                unbind(event.senderId.toString(), event.groupId, playerName)
+                if (plugin.unbindCooldownMap.containsKey(playerName)) {
+                    BotProvider.getBot()?.action(SendGroupMessage(event.groupId,
+                        plugin.getMessageManager().get("qq.whitelist.in_cooldown",
+                            mutableMapOf("name" to playerName, "cooldown_time" to plugin.unbindCooldownMap[playerName]!!.toString()))))
+                } else {
+                    plugin.unbindCooldownMap[playerName] = config.getLong("whitelist.cooldown.unbind")
+                    unbind(event.senderId.toString(), event.groupId, playerName)
+                }
                 return true
             }
         }

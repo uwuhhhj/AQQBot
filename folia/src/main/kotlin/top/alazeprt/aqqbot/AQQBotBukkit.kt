@@ -34,6 +34,9 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
 
     override val verifyCodeMap: MutableMap<String, Pair<String, Long>> = mutableMapOf()
 
+    override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+    override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+
     override lateinit var dataProvider: DataProvider
 
     override lateinit var enableGroups: MutableList<String>
