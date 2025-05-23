@@ -15,6 +15,7 @@ import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.hook.HookProvider
 import top.alazeprt.aqqbot.profile.AOfflinePlayer
 import top.alazeprt.aqqbot.task.TaskProvider
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
 import java.net.URI
 
@@ -31,6 +32,9 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
 
     var dataProvider: DataProvider
 
+    var toGroupFormatter: AFormatter
+    var toGameFormatter: AFormatter
+
     var libraryManager: LibraryManager
 
     override var generalConfig: FileConfiguration
@@ -43,6 +47,10 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
         loadData(DataStorageType.valueOf(generalConfig.getString("storage.type").uppercase()))
         loadDebug()
         loadCommands(this)
+        toGroupFormatter = AFormatter(this)
+        toGameFormatter = AFormatter(this)
+        toGroupFormatter.initialUrl(generalConfig.getStringList("chat.server_to_group.filter"))
+        toGameFormatter.initialUrl(generalConfig.getStringList("chat.group_to_server.filter"))
         adapter = loadAdapter()
         if (botConfig.getString("access_token").isNullOrBlank()) {
             loadBot(

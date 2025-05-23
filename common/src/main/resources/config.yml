@@ -168,11 +168,11 @@ chat:
     # 不支持在内容 正则表达式或替换内容种出现空格, 如需出现请用 [[space]] 代替
     # 如: $filter:{§x} $replaceTo:{} 代表将所有 §x 符号替换成空字符 (即将所有 §x 符号去除)
     # 如: $regex:{\d{11}} $replaceTo:{电话号码} 代表将所有11位数字替换成 电话号码
-    # 如: $url:{http://localhost:8080/test.json} $path:{filter} $replaceTo:{\"[[space]]屏蔽词[[space]]\"}
-    #     代表将所有在test.json内filter的列表里的屏蔽词替换为 " 屏蔽词 "
+    # 如: $url:{http://localhost:8080/test.json} $path:{filter} $replaceTo:{[[space]]屏蔽词[[space]]}
+    #     代表将所有在test.json内filter的列表里的屏蔽词替换为 屏蔽词
     filter:
       - ""
-#      - "$url:{https://gh.llkk.cc/https://github.com/alazeprt/AQQBot-Docs/raw/refs/heads/master/fucker/database.json}" # 脏话词库
+#      - "$url:{https://raw.githubusercontent.com/alazeprt/AQQBot-Docs/refs/heads/master/fucker/database.json} $path:{words} $replaceTo:{***}" # 脏话词库
 
 # 有关服务器的通知
 notify:

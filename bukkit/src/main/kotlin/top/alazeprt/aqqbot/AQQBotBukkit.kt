@@ -18,6 +18,7 @@ import top.alazeprt.aqqbot.event.BukkitEventHandler
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import java.util.concurrent.CompletableFuture
@@ -37,6 +38,9 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override lateinit var dataProvider: DataProvider
 
     override lateinit var enableGroups: MutableList<String>
+
+    override lateinit var toGameFormatter: AFormatter
+    override lateinit var toGroupFormatter: AFormatter
 
     override lateinit var libraryManager: LibraryManager
 

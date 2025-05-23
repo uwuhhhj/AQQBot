@@ -25,8 +25,10 @@ class AFormatter(val plugin: AQQBot) {
                     val key = match.groupValues[1].replace("[[space]]", " ")
                     val value = match.groupValues[2].replace("[[space]]", " ")
                     keyValueMap[key] = value
+                    println(key)
                 }
                 val urlString = keyValueMap["url"]
+                println(urlString)
                 HttpsURLConnection.setDefaultHostnameVerifier { _, _ -> true }
                 val url = URL(urlString ?: return@forEach)
                 val path = keyValueMap["path"] ?: "words"
@@ -59,6 +61,7 @@ class AFormatter(val plugin: AQQBot) {
                         jsonObject = jsonObject.getAsJsonObject(path.split(".")[i])
                     }
                     jsonObject.getAsJsonArray(path.split(".").last()).forEach {
+                        println(it.toString())
                         filters.add(it.toString())
                     }
                     remoteFilter["$urlString.$path"] = filters

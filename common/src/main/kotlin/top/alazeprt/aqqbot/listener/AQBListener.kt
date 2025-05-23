@@ -97,7 +97,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         if (!plugin.generalConfig.getBoolean("chat.group_to_server.enable")) {
             return null
         }
-        val formatter = AFormatter(plugin)
+        val formatter = plugin.toGameFormatter
         var newMessage = message;
         if (message.length > plugin.generalConfig.getInt("chat.max_forward_length")) {
             newMessage = newMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length")) + "..."

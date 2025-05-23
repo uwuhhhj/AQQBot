@@ -28,6 +28,7 @@ import top.alazeprt.aqqbot.event.AQuitEvent
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
+import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
 import java.io.File
 import java.nio.file.Path
@@ -51,6 +52,9 @@ class AQQBotVelocity : AQQBot {
 
     override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
     override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
+
+    override lateinit var toGameFormatter: AFormatter
+    override lateinit var toGroupFormatter: AFormatter
 
     override lateinit var libraryManager: LibraryManager
 
@@ -151,7 +155,6 @@ class AQQBotVelocity : AQQBot {
     }
 
     override fun registerCommand(command: String, handler: ACommand) {
-        val command = "aqqbot"
         val commandManager = server.commandManager
         val commandMeta = commandManager.metaBuilder(command)
             .plugin(this)
