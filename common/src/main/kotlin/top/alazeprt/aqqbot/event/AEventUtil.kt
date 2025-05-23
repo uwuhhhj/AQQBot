@@ -53,6 +53,7 @@ object AEventUtil {
         }
         val formatter = plugin.toGroupFormatter
         var formattedMessage = formatter.regexFilter(plugin.generalConfig.getStringList("chat.server_to_group.filter"), message)
+        if (formattedMessage.contentEquals("!CANCEL")) return null
         if (plugin.generalConfig.getBoolean("chat.server_to_group.default_format")) {
             formattedMessage = AFormatter.chatClear(formattedMessage)
         }

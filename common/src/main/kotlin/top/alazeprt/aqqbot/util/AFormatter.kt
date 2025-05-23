@@ -85,6 +85,7 @@ class AFormatter(val plugin: AQQBot) {
         val url = keyValueMap["url"]
         val path = keyValueMap["path"] ?: "words"
         val replaceTo = keyValueMap["replaceTo"] ?: ""
+        val cancel = keyValueMap["cancel"] ?: "false"
         if (regex != null) {
             return string.replace(Regex(regex), replaceTo)
         } else if (filter != null) {

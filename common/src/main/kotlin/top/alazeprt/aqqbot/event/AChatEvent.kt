@@ -10,7 +10,7 @@ class AChatEvent(val plugin: AQQBot, private val player: APlayer, private val me
     override fun handle() {
         if (canForwardMessage(plugin, message) != null) {
             plugin.submitAsync {
-                val message = canForwardMessage(plugin, message)!!
+                val message = canForwardMessage(plugin, message)?: return@submitAsync
                 plugin.enableGroups.forEach {
                     BotProvider.getBot()?.action(SendGroupMessage(
                         it.toLong(), plugin.getMessageManager().

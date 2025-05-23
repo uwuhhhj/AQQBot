@@ -103,11 +103,21 @@ class AQBListener(val plugin: AQQBot) : Listener {
             newMessage = newMessage.substring(0, plugin.generalConfig.getInt("chat.max_forward_length")) + "..."
         }
         if (plugin.generalConfig.getStringList("chat.group_to_server.prefix").contains("")) {
-            return formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage)
+            val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage)
+            return if (str.contentEquals("!CANCEL")) {
+                null
+            } else {
+                str
+            }
         }
         plugin.generalConfig.getStringList("chat.group_to_server.prefix").forEach {
             if (newMessage.startsWith(it)) {
-                return formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
+                val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
+                return if (str.contentEquals("!CANCEL")) {
+                    null
+                } else {
+                    str
+                }
             }
         }
         return null
