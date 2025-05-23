@@ -10,8 +10,9 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
     fun handle(input: String, userId: String, groupId: String): Boolean {
         val map = matches(input)?: return false
         val player: List<String> = plugin.getPlayerByQQ(userId.toLong()).map { it.getName() }
-        var outputString = mapFormat(output.joinToString("\n"), map)
+        var outputString: String
         if (player.isEmpty()) {
+            outputString = mapFormat(unbind_output.joinToString("\n"), map)
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
                 plugin.submit {
                     unbind_execute.forEach {
@@ -32,6 +33,7 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 BotProvider.getBot()?.action(SendGroupMessage(groupId.toLong(), outputString))
             }
         } else {
+            outputString = mapFormat(output.joinToString("\n"), map)
             if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
                 plugin.submit {
                     execute.forEach {
