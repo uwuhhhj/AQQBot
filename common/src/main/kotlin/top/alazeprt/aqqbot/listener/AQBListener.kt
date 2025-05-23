@@ -104,7 +104,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         }
         if (plugin.generalConfig.getStringList("chat.group_to_server.prefix").contains("")) {
             val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage)
-            return if (str.contentEquals("!CANCEL")) {
+            return if (str.contains("!CANCEL")) {
                 null
             } else {
                 str
@@ -113,7 +113,7 @@ class AQBListener(val plugin: AQQBot) : Listener {
         plugin.generalConfig.getStringList("chat.group_to_server.prefix").forEach {
             if (newMessage.startsWith(it)) {
                 val str = formatter.regexFilter(plugin.generalConfig.getStringList("chat.group_to_server.filter"), newMessage.substring(it.length))
-                return if (str.contentEquals("!CANCEL")) {
+                return if (str.contains("!CANCEL")) {
                     null
                 } else {
                     str
