@@ -16,7 +16,11 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
             if (unbind_execute.isNotEmpty() && unbind_execute[0].isNotEmpty()) {
                 plugin.submit {
                     unbind_execute.forEach {
-                        plugin.submitCommand(mapFormat(it, map))
+                        var str = it
+                        if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
+                            str = it.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                        }
+                        plugin.submitCommand(mapFormat(str, map))
                     }
                 }
             }
@@ -37,7 +41,11 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
             if (execute.isNotEmpty() && execute[0].isNotEmpty()) {
                 plugin.submit {
                     execute.forEach {
-                        plugin.submitCommand(mapFormat(it, map))
+                        var str = it
+                        if (plugin.getPlayerByQQ(userId.toLong()).isNotEmpty()) {
+                            str = it.replace("\$player", plugin.getPlayerByQQ(userId.toLong())[0].getName())
+                        }
+                        plugin.submitCommand(mapFormat(str, map))
                     }
                 }
             }

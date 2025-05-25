@@ -13,7 +13,7 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     }
 
     @EventHandler
-    fun onJoin(event: PlayerLoginEvent) {
+    fun onJoin(event: PlayerJoinEvent) {
         AJoinEvent(plugin, BukkitPlayer(event.player)).handle()
     }
 

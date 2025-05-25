@@ -15,6 +15,7 @@ import top.alazeprt.aqqbot.command.ACommand
 import top.alazeprt.aqqbot.data.DataProvider
 import top.alazeprt.aqqbot.debug.ADebug
 import top.alazeprt.aqqbot.event.BukkitEventHandler
+import top.alazeprt.aqqbot.hook.AQQBotExpansion
 import top.alazeprt.aqqbot.profile.APlayer
 import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
@@ -73,6 +74,9 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         audience = BukkitAudiences.create(this);
         server.pluginManager.registerEvents(BukkitEventHandler(this), this)
         val metrics = Metrics(this, pluginId)
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            AQQBotExpansion(this).register()
+        }
     }
 
     override fun onDisable() {
