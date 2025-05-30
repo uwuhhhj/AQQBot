@@ -50,7 +50,7 @@ abstract class ACustom(val plugin: AQQBot, val command: List<String>, val execut
                 }
             }
             val playerName = player[if (player.size < account) 0 else account - 1]
-            outputString = setPlaceholders(plugin.adapter!!.getOnlinePlayer(playerName), outputString)
+            outputString = setPlaceholders(plugin.adapter!!.getOfflinePlayer(playerName), outputString)
             if (format) {
                 outputString = AFormatter.pluginClear(outputString)
                 outputString = AFormatter.chatClear(outputString)
