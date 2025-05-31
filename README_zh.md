@@ -1,6 +1,6 @@
 # AQQBot
 
-[ENGLISH](https://github.com/alazeprt/AQQBot/blob/master/README.md) | 简体中文
+[ENGLISH](https://github.com/alazeprt/AQQBot/blob/refactor/README.md) | 简体中文
 
 ---
 
@@ -13,14 +13,14 @@
 ## 🚀 功能一览
 
 - **账户绑定**：玩家需在 QQ 群中绑定账号后才能进入服务器。
-- **信息查询**：在 QQ 群发送特定命令可查询账号游戏状态（如步行距离）及服务器状态（如 TPS）。
+- **信息查询**：在 QQ 群发送特定命令可查询账号游戏状态（如个人信息）及服务器状态（如 TPS）。
 - **群服互联**：QQ群与服务器消息互通，双向转发。
 
 ---
 
 ## 🌟 插件特点
 
-- **轻量级**：插件本体不足 600KB。
+- **轻量级**：插件本体仅 2MB。
 - **高度定制**：可通过配置文件自由开关各项功能。
 - **强大兼容性**：支持所有基于 Spigot/Paper 的服务端及 Velocity。
 
