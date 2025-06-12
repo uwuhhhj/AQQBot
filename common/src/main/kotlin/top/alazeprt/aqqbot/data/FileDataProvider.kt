@@ -10,12 +10,12 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
 
     private val file = File(plugin.getDataFolder(), "data.yml")
     private lateinit var dataConfig: FileConfiguration
-    val dataMap: MutableMap<String, MutableList<String>> = mutableMapOf()
+    val dataMap: MutableMap<String, String> = mutableMapOf()
 
     override fun loadData(type: DataStorageType) {
         dataConfig = YamlConfiguration.loadConfiguration(file)
         dataConfig.getKeys(false).forEach {
-            dataMap[it] = dataConfig.getStringList(it).toMutableList()
+            dataMap[it] = dataConfig.getString(it) ?: ""
         }
     }
 
@@ -31,61 +31,37 @@ class FileDataProvider(val plugin: AQQBot) : DataProvider {
     }
 
     override fun hasPlayer(player: AOfflinePlayer): Boolean {
-        dataMap.values.forEach {
-            if (it.contains(player.getName())) {
-                return true
-            }
-        }
-        return false
+        return dataMap.containsKey(player.getUUID().toString())
     }
 
     override fun hasQQ(qq: Long): Boolean {
-        return dataMap.containsKey(qq.toString())
+        return dataMap.values.any { it == qq.toString() }
     }
 
     override fun addPlayer(qq: Long, player: AOfflinePlayer) {
-        val list = getPlayerByQQ(qq).map { it.getName() }.toMutableList()
-        list.add(player.getName())
-        dataMap[qq.toString()] = list
+        dataMap[player.getUUID().toString()] = qq.toString()
     }
 
     override fun removePlayer(player: AOfflinePlayer) {
-        dataMap.values.forEach { value ->
-            if (value.contains(player.getName())) {
-                value.remove(player.getName())
-                return
-            }
-        }
+        dataMap.remove(player.getUUID().toString())
     }
 
     override fun removePlayer(qq: Long) {
-        if (hasQQ(qq)) dataMap.remove(qq.toString())
+        dataMap.entries.removeIf { it.value == qq.toString() }
     }
 
     override fun removePlayer(qq: Long, player: AOfflinePlayer) {
-        if (hasQQ(qq)) {
-            dataMap.get(qq.toString())!!.forEach {
-                if (it == player.getName()) {
-                    dataMap[qq.toString()]!!.remove(it)
-                    return
-                }
-            }
+        if (dataMap[player.getUUID().toString()] == qq.toString()) {
+            dataMap.remove(player.getUUID().toString())
         }
     }
 
     override fun getQQByPlayer(player: AOfflinePlayer): Long? {
-        dataMap.forEach {
-            it.value.forEach { value ->
-                if (value == player.getName()) {
-                    return it.key.toLong()
-                }
-            }
-        }
-        return null
+        return dataMap[player.getUUID().toString()]?.toLong()
     }
 
     override fun getPlayerByQQ(qq: Long): List<AOfflinePlayer> {
-        if (!hasQQ(qq)) return emptyList()
-        return dataMap[qq.toString()]!!.map { plugin.adapter!!.getOfflinePlayer(it) }
+        return dataMap.filterValues { it == qq.toString() }
+            .map { plugin.adapter!!.getOfflinePlayer(java.util.UUID.fromString(it.key)) }
     }
 }

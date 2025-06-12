@@ -22,13 +22,13 @@ class SQLiteProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
         Database.settingsFile = DatabaseSource(dataSourceConfig)
         val dataSource by lazy { host.createDataSource() }
         table = Table("account_data", host) {
-            add("userId") {
-                type(ColumnTypeSQLite.INTEGER) {
+            add("uuid") {
+                type(ColumnTypeSQLite.TEXT) {
                     options(ColumnOptionSQLite.PRIMARY_KEY)
                 }
             }
-            add("name") {
-                type(ColumnTypeSQLite.TEXT) {
+            add("qq") {
+                type(ColumnTypeSQLite.INTEGER) {
                     options(ColumnOptionSQLite.NOTNULL)
                 }
             }

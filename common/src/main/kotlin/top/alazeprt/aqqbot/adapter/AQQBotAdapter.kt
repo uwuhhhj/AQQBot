@@ -7,6 +7,8 @@ import top.alazeprt.aqqbot.profile.APlayer
 interface AQQBotAdapter {
     fun getOfflinePlayer(name: String): AOfflinePlayer
 
+    fun getOfflinePlayer(uuid: java.util.UUID): AOfflinePlayer
+
     fun getOnlinePlayer(name: String): APlayer?
 
     fun getPlayerList(): List<APlayer>

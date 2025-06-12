@@ -28,13 +28,13 @@ class MySQLProvider(plugin: AQQBot) : DatabaseDataProvider(plugin) {
         val dataSource by lazy { host.createDataSource() }
 
         table = Table("account_data", host) {
-            add("userId") {
-                type(ColumnTypeSQL.BIGINT) {
+            add("uuid") {
+                type(ColumnTypeSQL.VARCHAR, 36) {
                     options(ColumnOptionSQL.PRIMARY_KEY)
                 }
             }
-            add("name") {
-                type(ColumnTypeSQL.VARCHAR, 128) {
+            add("qq") {
+                type(ColumnTypeSQL.BIGINT) {
                     options(ColumnOptionSQL.NOTNULL)
                 }
             }

@@ -11,6 +11,10 @@ object BukkitAdapter : AQQBotAdapter {
         return BukkitOfflinePlayer(Bukkit.getOfflinePlayer(name))
     }
 
+    override fun getOfflinePlayer(uuid: java.util.UUID): AOfflinePlayer {
+        return BukkitOfflinePlayer(Bukkit.getOfflinePlayer(uuid))
+    }
+
     override fun getOnlinePlayer(name: String): APlayer? {
         return BukkitPlayer(Bukkit.getPlayer(name)?: return null)
     }
