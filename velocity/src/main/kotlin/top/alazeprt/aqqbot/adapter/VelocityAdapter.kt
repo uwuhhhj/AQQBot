@@ -12,6 +12,10 @@ class VelocityAdapter(val plugin: AQQBotVelocity) : AQQBotAdapter {
         return VelocityOfflinePlayer(GameProfile.forOfflinePlayer(name))
     }
 
+    override fun getOfflinePlayer(uuid: java.util.UUID): AOfflinePlayer {
+        return VelocityOfflinePlayer(GameProfile(uuid, "unknown", listOf()))
+    }
+
     override fun getOnlinePlayer(name: String): APlayer? {
         return plugin.server.getPlayer(name).getOrNull()?.let { VelocityPlayer(it) }
     }
