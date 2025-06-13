@@ -36,6 +36,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
     override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
 
+    override val unboundPlayers: MutableSet<String> = mutableSetOf()
+
     override lateinit var dataProvider: DataProvider
 
     override lateinit var enableGroups: MutableList<String>

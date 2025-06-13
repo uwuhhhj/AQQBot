@@ -30,6 +30,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     val bindCooldownMap: MutableMap<String, Long>  // <name, time>
     val unbindCooldownMap: MutableMap<String, Long>
 
+    val unboundPlayers: MutableSet<String>
+
     var dataProvider: DataProvider
 
     var toGroupFormatter: AFormatter

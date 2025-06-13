@@ -53,6 +53,8 @@ class AQQBotVelocity : AQQBot {
     override val bindCooldownMap: MutableMap<String, Long> = mutableMapOf()
     override val unbindCooldownMap: MutableMap<String, Long> = mutableMapOf()
 
+    override val unboundPlayers: MutableSet<String> = mutableSetOf()
+
     override lateinit var toGameFormatter: AFormatter
     override lateinit var toGroupFormatter: AFormatter
 
