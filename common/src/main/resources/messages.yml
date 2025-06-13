@@ -60,3 +60,12 @@ game:
     - "&b/aqqbot forceunbind <qq|player> <数据>   &e强制解除绑定(qq: QQ号, player: 游戏名, 根据数据选择其一)"
     - "&b/aqqbot query <qq|player> <数据>   &e根据QQ号或游戏名查询对应的游戏名或QQ号"
     - "&b/aqqbot help   &e查看此帮助页面"
+  # 未绑定账号时的提示消息
+  not_bind_reminder:
+    message: "&c您未绑定账号，请加群发送\"绑定 绑定码\"\n&e绑定码: ${code}"
+    title: "&c您未绑定账号"
+    subtitle: "&e绑定: ${code}"
+  # 配置文件版本更新提示
+  config_update:
+    outdated: "&a检测到你正在使用 AQQBot 的低版本配置文件, 这可能会引起一些问题"
+    instruction: "&a插件已自动释放新版本配置文件并命名为 config_new.yml, 请根据你的旧版本配置文件 (config.yml) 修改该文件并重命名为 config.yml, 最后执行 /aqqbot reload 应用修改"
