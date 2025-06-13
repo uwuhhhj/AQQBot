@@ -2,6 +2,7 @@ package top.alazeprt.aqqbot.adapter
 
 import com.velocitypowered.api.proxy.Player
 import net.kyori.adventure.text.Component
+import com.velocitypowered.api.util.title.Title
 import top.alazeprt.aqqbot.profile.APlayer
 import java.util.*
 
@@ -30,4 +31,8 @@ class VelocityPlayer(val player: Player) : APlayer {
         return player.hasPermission(permission)
     }
 
+    override fun sendTitle(title: String, subTitle: String) {
+        val t = Title.title(Component.text(title), Component.text(subTitle))
+        player.showTitle(t)
+    }
 }

@@ -30,6 +30,10 @@ whitelist:
   # 是否必须绑定后才能进入游戏
   # ! 若关闭该功能, 则 VERIFY_CODE 的验证方法不起效
   need_bind_to_login: true
+  # 若允许未绑定进入但限制移动, 设置为 true
+  login_server_is_allowed_but_limit: false
+  # 若允许未绑定进入时循环提醒绑定, 设置为 true
+  login_server_is_allowed_but_remind: false
 
   # 验证方法
   # - GROUP_NAME: 在QQ群中发送 $command $name 来给自己的QQ绑定指定的游戏账户(名称)

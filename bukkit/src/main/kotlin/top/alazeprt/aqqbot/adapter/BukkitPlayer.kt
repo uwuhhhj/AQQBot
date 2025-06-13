@@ -30,4 +30,8 @@ class BukkitPlayer(val player: Player) : APlayer {
     override fun hasPermission(permission: String): Boolean {
         return player.hasPermission(permission)
     }
+
+    override fun sendTitle(title: String, subTitle: String) {
+        player.sendTitle(title, subTitle, 10, 70, 20)
+    }
 }

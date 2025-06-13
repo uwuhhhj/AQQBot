@@ -45,6 +45,7 @@ class WhitelistHandler(val plugin: AQQBot) {
             return false
         }
         plugin.addPlayer(userId.toLong(), plugin.adapter!!.getOfflinePlayer(playerName))
+        plugin.unboundPlayers.remove(playerName)
         BotProvider.getBot()?.action(SendGroupMessage(groupId, plugin.getMessageManager().get("qq.whitelist.bind_successful"), true))
         plugin.debugModule?.debugLogger?.log("$userId bind $userId to account $playerName")
         if (config.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {

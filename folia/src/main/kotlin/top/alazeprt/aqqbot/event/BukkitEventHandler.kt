@@ -21,4 +21,12 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     fun onQuit(event: PlayerQuitEvent) {
         AQuitEvent(plugin, BukkitPlayer(event.player)).handle()
     }
+
+    @EventHandler
+    fun onMove(event: PlayerMoveEvent) {
+        if (plugin.generalConfig.getBoolean("whitelist.login_server_is_allowed_but_limit") &&
+            plugin.unboundPlayers.contains(event.player.name)) {
+            event.isCancelled = true
+        }
+    }
 }

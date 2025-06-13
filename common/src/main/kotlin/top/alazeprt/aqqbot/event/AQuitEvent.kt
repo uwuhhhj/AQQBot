@@ -7,5 +7,6 @@ import top.alazeprt.aqqbot.profile.APlayer
 class AQuitEvent(val plugin: AQQBot, private val player: APlayer): AEvent {
     override fun handle() {
         playerStatusHandler(plugin, player, false)
+        plugin.unboundPlayers.remove(player.getName())
     }
 }

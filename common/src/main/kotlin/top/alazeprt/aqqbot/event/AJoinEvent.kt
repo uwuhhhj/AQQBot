@@ -5,6 +5,7 @@ import top.alazeprt.aqqbot.AQQBot
 import top.alazeprt.aqqbot.event.AEventUtil.playerStatusHandler
 import top.alazeprt.aqqbot.event.AEventUtil.whitelistHandler
 import top.alazeprt.aqqbot.profile.APlayer
+import java.util.UUID
 
 class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
     override fun handle() {
@@ -25,6 +26,27 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
         }
 
         if (!handle1 || !handle2) {
+            if (!plugin.generalConfig.getBoolean("whitelist.need_bind_to_login") &&
+                plugin.generalConfig.getBoolean("whitelist.login_server_is_allowed_but_limit") &&
+                !plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(player.getName()))) {
+                plugin.unboundPlayers.add(player.getName())
+            }
+            if (!plugin.generalConfig.getBoolean("whitelist.need_bind_to_login") &&
+                plugin.generalConfig.getBoolean("whitelist.login_server_is_allowed_but_remind") &&
+                !plugin.hasPlayer(plugin.adapter!!.getOfflinePlayer(player.getName()))) {
+                val verifyCode = plugin.verifyCodeMap[player.getName()]?.first ?: UUID.randomUUID().toString().substring(0, 6)
+                if (!plugin.verifyCodeMap.containsKey(player.getName())) {
+                    plugin.verifyCodeMap[player.getName()] = Pair(verifyCode, System.currentTimeMillis())
+                }
+                plugin.submitAsync {
+                    while (plugin.unboundPlayers.contains(player.getName())) {
+                        val p = plugin.adapter!!.getOnlinePlayer(player.getName()) ?: break
+                        p.sendMessage("§c您未绑定账号，请加群发送绑定码\n§e绑定码: $verifyCode")
+                        p.sendTitle("§c您未绑定账号", "§e绑定码: $verifyCode")
+                        Thread.sleep(100L * 50L)
+                    }
+                }
+            }
             playerStatusHandler(plugin, player, true)
             if (plugin.configNeedUpdate() && player.hasPermission("aqqbot.admin")) {
                 plugin.submitLater(10) {

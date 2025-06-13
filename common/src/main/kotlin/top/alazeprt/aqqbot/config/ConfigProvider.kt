@@ -43,6 +43,12 @@ interface ConfigProvider {
         if (generalConfig.getInt("chat.max_forward_length") <= 0) {
             generalConfig.set("chat.max_forward_length", 200)
         }
+        if (!generalConfig.contains("whitelist.login_server_is_allowed_but_limit")) {
+            generalConfig.set("whitelist.login_server_is_allowed_but_limit", false)
+        }
+        if (!generalConfig.contains("whitelist.login_server_is_allowed_but_remind")) {
+            generalConfig.set("whitelist.login_server_is_allowed_but_remind", false)
+        }
         if (generalConfig.getInt("version") != 17) {
             generalConfig.set("version", 17)
             generalConfig.set("whitelist.cooldown.bind", 60)

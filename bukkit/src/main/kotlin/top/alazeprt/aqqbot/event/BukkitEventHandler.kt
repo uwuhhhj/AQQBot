@@ -6,6 +6,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerLoginEvent
 import org.bukkit.event.player.PlayerQuitEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import top.alazeprt.aqqbot.AQQBotBukkit
 import top.alazeprt.aqqbot.adapter.BukkitPlayer
 
@@ -23,5 +24,13 @@ class BukkitEventHandler(val plugin: AQQBotBukkit) : Listener {
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         AQuitEvent(plugin, BukkitPlayer(event.player)).handle()
+    }
+
+    @EventHandler
+    fun onMove(event: PlayerMoveEvent) {
+        if (plugin.generalConfig.getBoolean("whitelist.login_server_is_allowed_but_limit") &&
+            plugin.unboundPlayers.contains(event.player.name)) {
+            event.isCancelled = true
+        }
     }
 }
