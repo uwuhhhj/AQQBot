@@ -36,6 +36,7 @@ import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
+import top.alazeprt.aqqbot.task.CancelableFuture
 
 
 @Plugin(id = "aqqbot", name = "AQQBot", version = "2.0-beta.9", url = "https://aqqbot.alazeprt.top", authors = ["alazeprt"])
@@ -73,6 +74,8 @@ class AQQBotVelocity : AQQBot {
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0
 
+    private val tasks = mutableListOf<Future<*>>()
+
     lateinit var server: ProxyServer
     lateinit var logger: Logger
     lateinit var dataFolder: Path
@@ -99,6 +102,7 @@ class AQQBotVelocity : AQQBot {
 
     @Subscribe
     fun onProxyShutdown(event: ProxyShutdownEvent) {
+        cancelAll()
         this.disable()
     }
 
@@ -176,40 +180,52 @@ class AQQBotVelocity : AQQBot {
     }
 
     override fun submit(task: Runnable): Future<*> {
+        val future = CancelableFuture { }
+        tasks.add(future)
         task.run()
-        return CompletableFuture.completedFuture<Any>(null)
+        future.complete(null)
+        return future
     }
 
     override fun submitAsync(task: Runnable): Future<*> {
-        executor.submit(task)
-        return CompletableFuture.completedFuture<Any>(null)
+        val future = executor.submit(task)
+        tasks.add(future)
+        return future
     }
 
     override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, task).delay(Duration.ofMillis(delay * 50L)).schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        val scheduled = server.scheduler.buildTask(this, task).delay(Duration.ofMillis(delay * 50L)).schedule()
+        val future = CancelableFuture { scheduled.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, Runnable { executor.submit(task) })
+        val scheduled = server.scheduler.buildTask(this, Runnable { executor.submit(task) })
             .delay(Duration.ofMillis(delay * 50L)).schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        val future = CancelableFuture { scheduled.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, task)
+        val scheduled = server.scheduler.buildTask(this, task)
             .delay(Duration.ofMillis(delay * 50L))
             .repeat(Duration.ofMillis(period * 50L))
             .schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        val future = CancelableFuture { scheduled.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
-        server.scheduler.buildTask(this, Runnable { executor.submit(task) })
+        val scheduled = server.scheduler.buildTask(this, Runnable { executor.submit(task) })
             .delay(Duration.ofMillis(delay * 50L))
             .repeat(Duration.ofMillis(period * 50L))
             .schedule()
-        return CompletableFuture.completedFuture<Any>(null)
+        val future = CancelableFuture { scheduled.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitCommand(command: String): CompletableFuture<AExecution> {
@@ -218,7 +234,11 @@ class AQQBotVelocity : AQQBot {
             sender.execute(command)
         }
         return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            try {
+                Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            } catch (e: InterruptedException) {
+                return@supplyAsync sender
+            }
             sender
         }
     }
@@ -286,5 +306,11 @@ class AQQBotVelocity : AQQBot {
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
         libraryManager.loadLibraries(guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+    }
+
+    override fun cancelAll() {
+        log(LogLevel.DEBUG, "Cancelling ${'$'}{tasks.size} tasks")
+        tasks.forEach { it.cancel(true) }
+        tasks.clear()
     }
 }

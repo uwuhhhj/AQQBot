@@ -26,6 +26,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
+import top.alazeprt.aqqbot.task.CancelableFuture
 
 
 class AQQBotBukkit : JavaPlugin(), AQQBot {
@@ -63,6 +64,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0
 
+    private val tasks = mutableListOf<Future<*>>()
+
     companion object {
         lateinit var audience: BukkitAudiences
     }
@@ -81,6 +84,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onDisable() {
+        cancelAll()
         this.disable()
         audience.close()
     }
@@ -121,34 +125,57 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun submit(task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().run(this) { task.run() }
-        return CompletableFuture.completedFuture<Void>(null)
+        val schedTask = Bukkit.getGlobalRegionScheduler().run(this) { task.run() }
+        val future = CancelableFuture { schedTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitAsync(task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runNow(this) { task.run() }
-        return CompletableFuture.completedFuture<Void>(null)
+        var schedTask: io.papermc.paper.threadedregions.scheduler.ScheduledTask? = null
+        val future = CancelableFuture { schedTask?.cancel() }
+        schedTask = Bukkit.getAsyncScheduler().runNow(this) {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        }
+        tasks.add(future)
+        return future
     }
 
     override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().runDelayed(this, { task.run() }, delay)
-        return CompletableFuture.completedFuture<Void>(null)
+        val schedTask = Bukkit.getGlobalRegionScheduler().runDelayed(this, { task.run() }, delay)
+        val future = CancelableFuture { schedTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runDelayed(this, { task.run() }, delay * 50, TimeUnit.MILLISECONDS)
-        return CompletableFuture.completedFuture<Void>(null)
+        var schedTask: io.papermc.paper.threadedregions.scheduler.ScheduledTask? = null
+        val future = CancelableFuture { schedTask?.cancel() }
+        schedTask = Bukkit.getAsyncScheduler().runDelayed(this, {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        }, delay * 50, TimeUnit.MILLISECONDS)
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, { task.run() }, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
+        val schedTask = Bukkit.getGlobalRegionScheduler().runAtFixedRate(this, { task.run() }, delay, period)
+        val future = CancelableFuture { schedTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getAsyncScheduler().runAtFixedRate(this, { task.run() }, delay * 50, period * 50, TimeUnit.MILLISECONDS)
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, task, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
+        var schedTask: io.papermc.paper.threadedregions.scheduler.ScheduledTask? = null
+        val future = CancelableFuture { schedTask?.cancel() }
+        schedTask = Bukkit.getAsyncScheduler().runAtFixedRate(this, {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        }, delay * 50, period * 50, TimeUnit.MILLISECONDS)
+        tasks.add(future)
+        return future
     }
 
     override fun submitCommand(command: String): CompletableFuture<AExecution> {
@@ -157,7 +184,11 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             sender.execute(command)
         }
         return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            try {
+                Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            } catch (e: InterruptedException) {
+                return@supplyAsync sender
+            }
             sender
         }
     }
@@ -243,5 +274,11 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
         libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+    }
+
+    override fun cancelAll() {
+        log(LogLevel.DEBUG, "Cancelling ${'$'}{tasks.size} tasks")
+        tasks.forEach { it.cancel(true) }
+        tasks.clear()
     }
 }

@@ -5,7 +5,11 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
 
 interface TaskProvider {
-    // TODO: add cancel() method for every task submitted
+    /**
+     * 取消所有通过此接口提交的任务
+     */
+    fun cancelAll()
+
     fun submit(task: Runnable): Future<*>
 
     fun submitAsync(task: Runnable): Future<*>

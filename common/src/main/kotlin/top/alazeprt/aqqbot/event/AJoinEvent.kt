@@ -47,7 +47,11 @@ class AJoinEvent(val plugin: AQQBot, private val player: APlayer) : AEvent {
                         AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_bind_reminder.title", messageParams)),
                         AFormatter.pluginToChat(plugin.getMessageManager().get("game.not_bind_reminder.subtitle", messageParams))
                     )
-                    Thread.sleep(100L * 50L)
+                    try {
+                        Thread.sleep(100L * 50L)
+                    } catch (e: InterruptedException) {
+                        return@submitAsync
+                    }
                 }
             }
         }

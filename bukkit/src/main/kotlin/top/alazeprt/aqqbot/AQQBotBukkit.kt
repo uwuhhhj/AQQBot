@@ -21,6 +21,7 @@ import top.alazeprt.aqqbot.util.ACustom
 import top.alazeprt.aqqbot.util.AExecution
 import top.alazeprt.aqqbot.util.AFormatter
 import top.alazeprt.aqqbot.util.LogLevel
+import top.alazeprt.aqqbot.task.CancelableFuture
 import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Future
@@ -61,6 +62,8 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     override var loadSparkCount: Int = 0
     override var loadFloodgateCount: Int = 0
 
+    private val tasks = mutableListOf<Future<*>>()
+
     companion object {
         lateinit var audience: BukkitAudiences
     }
@@ -82,6 +85,7 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun onDisable() {
+        cancelAll()
         this.disable()
         audience.close()
     }
@@ -122,33 +126,57 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
     }
 
     override fun submit(task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTask(this, task)
-        return CompletableFuture.completedFuture<Void>(null)
+        val bukkitTask = Bukkit.getScheduler().runTask(this, task)
+        val future = CancelableFuture { bukkitTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitAsync(task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskAsynchronously(this, task)
-        return CompletableFuture.completedFuture<Void>(null)
+        var bukkitTask: org.bukkit.scheduler.BukkitTask? = null
+        val future = CancelableFuture { bukkitTask?.cancel() }
+        bukkitTask = Bukkit.getScheduler().runTaskAsynchronously(this, Runnable {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        })
+        tasks.add(future)
+        return future
     }
 
     override fun submitLater(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskLater(this, task, delay)
-        return CompletableFuture.completedFuture<Void>(null)
+        val bukkitTask = Bukkit.getScheduler().runTaskLater(this, task, delay)
+        val future = CancelableFuture { bukkitTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitLaterAsync(delay: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, task, delay)
-        return CompletableFuture.completedFuture<Void>(null)
+        var bukkitTask: org.bukkit.scheduler.BukkitTask? = null
+        val future = CancelableFuture { bukkitTask?.cancel() }
+        bukkitTask = Bukkit.getScheduler().runTaskLaterAsynchronously(this, Runnable {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        }, delay)
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimer(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskTimer(this, task, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
+        val bukkitTask = Bukkit.getScheduler().runTaskTimer(this, task, delay, period)
+        val future = CancelableFuture { bukkitTask.cancel() }
+        tasks.add(future)
+        return future
     }
 
     override fun submitTimerAsync(delay: Long, period: Long, task: Runnable): Future<*> {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, task, delay, period)
-        return CompletableFuture.completedFuture<Void>(null)
+        var bukkitTask: org.bukkit.scheduler.BukkitTask? = null
+        val future = CancelableFuture { bukkitTask?.cancel() }
+        bukkitTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this, Runnable {
+            future.runningThread = Thread.currentThread()
+            task.run()
+        }, delay, period)
+        tasks.add(future)
+        return future
     }
 
     override fun submitCommand(command: String): CompletableFuture<AExecution> {
@@ -157,7 +185,12 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
             sender.execute(command)
         }
         return CompletableFuture.supplyAsync {
-            Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            try {
+                Thread.sleep(1000L * generalConfig.getInt("command_execution.delay"))
+            } catch (e: InterruptedException) {
+                // 任务被取消或线程被中断，安全退出
+                return@supplyAsync sender
+            }
             sender
         }
     }
@@ -243,5 +276,11 @@ class AQQBotBukkit : JavaPlugin(), AQQBot {
         libraryManager.addMavenCentral()
         libraryManager.addJitPack()
         libraryManager.loadLibraries(adventureBukkitLib, guavaLib, hikaricpLib, sqliteLib, mysqlLib, aconfigurationLib, databaseLib, aonebotLib)
+    }
+
+    override fun cancelAll() {
+        log(LogLevel.DEBUG, "Cancelling ${'$'}{tasks.size} tasks")
+        tasks.forEach { it.cancel(true) }
+        tasks.clear()
     }
 }

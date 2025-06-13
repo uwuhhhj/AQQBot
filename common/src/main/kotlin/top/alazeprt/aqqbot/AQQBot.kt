@@ -66,56 +66,47 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
                 botConfig.getString("access_token")
             )
         }
-        submitAsync {
-            while (true) {
-                if (getBot()?.isConnected != true) {
-                    if (botConfig.getString("access_token").isNullOrBlank()) {
-                        loadBot(
-                            this,
-                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
-                        )
-                    } else {
-                        loadBot(
-                            this,
-                            URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
-                            botConfig.getString("access_token")
-                        )
-                    }
+        submitTimerAsync(0, botConfig.getLong("check_interval") * 20) {
+            if (getBot()?.isConnected != true) {
+                if (botConfig.getString("access_token").isNullOrBlank()) {
+                    loadBot(
+                        this,
+                        URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port"))
+                    )
+                } else {
+                    loadBot(
+                        this,
+                        URI.create("ws://" + botConfig.getString("ws.host") + ":" + botConfig.getInt("ws.port")),
+                        botConfig.getString("access_token")
+                    )
                 }
-                Thread.sleep(botConfig.getLong("check_interval") * 1000)
             }
         }
         loadHook(this)
         if (generalConfig.getString("whitelist.verify_method")?.uppercase() == "VERIFY_CODE") {
-            submitAsync {
-                while (true) {
-                    verifyCodeMap.forEach {
-                        if (System.currentTimeMillis() - it.value.second >
-                               generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
-                            verifyCodeMap.remove(it.key)
-                        }
+            submitTimerAsync(0, 100) {
+                verifyCodeMap.forEach {
+                    if (System.currentTimeMillis() - it.value.second >
+                        generalConfig.getLong("whitelist.verify_code_expire_time") * 1000L) {
+                        verifyCodeMap.remove(it.key)
                     }
-                    Thread.sleep(5000)
                 }
             }
         }
-        submitAsync {
-            while (true) {
-                for ((k, v) in bindCooldownMap) {
-                    if (v <= 0) {
-                        bindCooldownMap.remove(k)
-                    } else {
-                        bindCooldownMap[k] = v - 1;
-                    }
+        submitTimerAsync(0, 20) {
+            for ((k, v) in bindCooldownMap) {
+                if (v <= 0) {
+                    bindCooldownMap.remove(k)
+                } else {
+                    bindCooldownMap[k] = v - 1
                 }
-                for ((k, v) in unbindCooldownMap) {
-                    if (v <= 0) {
-                        unbindCooldownMap.remove(k)
-                    } else {
-                        unbindCooldownMap[k] = v - 1;
-                    }
+            }
+            for ((k, v) in unbindCooldownMap) {
+                if (v <= 0) {
+                    unbindCooldownMap.remove(k)
+                } else {
+                    unbindCooldownMap[k] = v - 1
                 }
-                Thread.sleep(1000)
             }
         }
         if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
@@ -132,6 +123,8 @@ interface AQQBot: ConfigProvider, CommandProvider, DataProvider, HookProvider, T
     fun loadDependencies()
 
     fun disable() {
+        log(LogLevel.DEBUG, "Cancelling all tasks")
+        cancelAll()
         if (generalConfig.getBoolean("notify.server_status.enable") && getBot() != null &&
             getBot()!!.isConnected) {
             enableGroups.forEach {
